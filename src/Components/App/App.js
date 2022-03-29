@@ -1,8 +1,8 @@
 
 import './App.css';
-import '../SearchBar';
-import '../Playlist';
-import '../SearchResults';
+// import '../SearchBar';
+// import '../Playlist';
+// import '../SearchResults';
 
 function App() {
   return (
