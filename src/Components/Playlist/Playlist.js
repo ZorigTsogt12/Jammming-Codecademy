@@ -5,10 +5,11 @@ import {TrackList} from '../TrackList/TrackList.js'
 export class Playlist extends React.Component {
     render() {
         return (
-            <div class="Playlist">
+            <div className="Playlist">
                 <input value={'New Playlist'}/>
                 {/* <!-- Add a TrackList component --> */}
-                <button class="Playlist-save">SAVE TO SPOTIFY</button>
+                <TrackList tracks={this.props.playlistTracks} onRemove={this.props.onRemove} isRemoval={true} />
+                <button className="Playlist-save">SAVE TO SPOTIFY</button>
             </div>
         )
     }
