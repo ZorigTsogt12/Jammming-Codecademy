@@ -51,58 +51,65 @@ const Spotify = {
     },
 
     savePlaylist(playlistName, trackURIs) {
-        if(playlistName && trackURIs) {
-            let accessToken = userAccessToken;
-            let headers = {Authorization: `Bearer${userAccessToken}`}
-            let userID = ''
-
-            fetch('https://api.spotify.com/v1/me', {headers: headers})
-            .then(response => {
-                if(response.ok) {
-                    return response.json();
-                }
-                throw new Error('Request Failed for fetching user ID');
-            })
-            .then(userData => {
-                userID = userData.id
-                fetch(`https://api.spotify.com/v1/users/${userID}/playlists`, {
-                    method: 'POST',
-                    headers: headers,
-                    body: {
-                        name: playlistName,
-                        public: false
-                    }
-                })
+        return new Promise(resolve => {
+            if(playlistName && trackURIs) {
+                let headers = {Authorization: `Bearer ${this.getAccessToken()}`}
+                let userID = ''
+    
+                fetch('https://api.spotify.com/v1/me', {headers: headers})
                 .then(response => {
                     if(response.ok) {
                         return response.json();
                     }
-                    throw new Error('Request failed for new playlist')
+                    throw new Error('Request Failed for fetching user ID');
                 })
-                .then(playlist => {
-                    let playlistID = playlist.id
-                    fetch(`https://api.spotify.com/v1/users/${userID}/playlists/${playlistID}/tracks`, {
+                .then(userData => {
+                    userID = userData.id
+                    console.log(userID)
+                    console.log(playlistName)
+                    fetch(`https://api.spotify.com/v1/users/${userID}/playlists`, {
                         method: 'POST',
-                        headers: headers,
-                        body: {
-                            uris: trackURIs,
-                            position: 0
-                        }
+                        headers: {Authorization: `Bearer ${this.getAccessToken()}`, 'Content-Type': 'application/json'},
+                        body: JSON.stringify({
+                            name: playlistName,
+                            description: 'cool playlist jamming',
+                            public: false
+                        })
                     })
                     .then(response => {
                         if(response.ok) {
                             return response.json();
                         }
-                        throw new Error('Request failed for adding tracks');
+                        throw new Error('Request failed for new playlist')
                     })
-                    .then(tracks => {
-                        let snapshotID = tracks.snapshop_id;
+                    .then(playlist => {
+                        let playlistID = playlist.id
+                        
+                        fetch(`https://api.spotify.com/v1/users/${userID}/playlists/${playlistID}/tracks`, {
+                            method: 'POST',
+                            headers: headers,
+                            body: JSON.stringify({
+                                uris: trackURIs,
+                                position: 0
+                            })
+                        })
+                        .then(response => {
+                            if(response.ok) {
+                                return response.json();
+                            }
+                            throw new Error('Request failed for adding tracks');
+                        })
+                        .then(tracks => {
+                            let snapshotID = tracks.snapshop_id;
+                            resolve(console.log('COMPLETED'))
+                        })
                     })
                 })
-            })
-        } else {
-            return false;
-        }
+            } else {
+                return false;
+            }
+        })
+        
     }
 };
 
